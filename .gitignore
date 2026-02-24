@@ -1,0 +1,27 @@
+# OS / editor noise
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Logs
+*.log
+logs/
+
+# Java / Gradle outputs
+**/build/
+**/.gradle/
+**/out/
+**/bin/
+
+# Test / coverage
+**/target/
+**/coverage/
+

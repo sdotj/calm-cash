@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/budget_dev
+    username: budget
+    password: budget
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: budget
+        format_sql: true
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    schemas: budget
+    default-schema: budget
+    locations: classpath:db/migration
+
+app:
+  jwt:
+    issuer: "budgeting-auth"
+    secret: "${JWT_SECRET:dev-placeholder}"
+    access-token-minutes: 15
+    refresh-token-days: 14
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
