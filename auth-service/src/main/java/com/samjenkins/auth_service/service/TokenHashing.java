@@ -7,6 +7,7 @@ import java.util.Base64;
 public final class TokenHashing {
     private TokenHashing() {}
 
+    //sha256
     public static String sha256Base64(String raw) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
