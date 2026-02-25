@@ -8,6 +8,8 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.UUID;
+
+import com.samjenkins.auth_service.util.ServiceConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,10 +47,10 @@ public class RefreshTokenService {
         String presentedHash = TokenHashing.sha256Base64(presentedRawToken);
 
         RefreshTokenEntity current = repo.findByTokenHash(presentedHash)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
+            .orElseThrow(() -> new IllegalArgumentException(ServiceConstants.INVALID_REFRESH_TOKEN));
 
         if (current.isRevoked() || current.isExpired()) {
-            throw new IllegalArgumentException("Refresh token expired or revoked");
+            throw new IllegalArgumentException(ServiceConstants.REFRESH_TOKEN_EXPIRED);
         }
 
         IssuedRefreshToken next = issue(current.getUserId(), ip, userAgent);
@@ -65,7 +67,7 @@ public class RefreshTokenService {
         String presentedHash = TokenHashing.sha256Base64(presentedRawToken);
 
         RefreshTokenEntity current = repo.findByTokenHash(presentedHash)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
+            .orElseThrow(() -> new IllegalArgumentException(ServiceConstants.INVALID_REFRESH_TOKEN));
 
         if (!current.isRevoked()) {
             current.setRevokedAt(Instant.now());

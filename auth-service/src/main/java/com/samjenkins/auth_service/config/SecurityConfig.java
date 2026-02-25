@@ -1,6 +1,7 @@
 package com.samjenkins.auth_service.config;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +15,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import java.util.Objects;
 
 @Configuration
 public class SecurityConfig {
@@ -28,9 +37,10 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/error").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/auth/register", "/auth/login", "/auth/refresh", "/auth/logout").permitAll()
                 .anyRequest().authenticated()
             )
             // This lets /me use Bearer token issued by this service
@@ -53,12 +63,33 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder(JwtProperties props) {
         SecretKey key = hmacKey(props.secret());
-        return NimbusJwtDecoder.withSecretKey(key).build();
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(key)
+            .macAlgorithm(MacAlgorithm.HS256)
+            .build();
+        decoder.setJwtValidator(jwtValidator(props));
+        return decoder;
+    }
+
+    private OAuth2TokenValidator<Jwt> jwtValidator(JwtProperties props) {
+        OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(props.issuer());
+        OAuth2TokenValidator<Jwt> withAudience = jwt -> {
+            List<String> audiences = jwt.getAudience();
+            if (audiences != null && audiences.contains(props.audience())) {
+                return OAuth2TokenValidatorResult.success();
+            }
+            return OAuth2TokenValidatorResult.failure(
+                new OAuth2Error("invalid_token", "The required audience is missing", null)
+            );
+        };
+        return new DelegatingOAuth2TokenValidator<>(withIssuer, withAudience);
     }
 
     private SecretKey hmacKey(String secret) {
-        byte[] bytes = secret.getBytes(StandardCharsets.UTF_8);
-        // HS256 expects at least 256-bit key. For local dev this is fine.
+        String configuredSecret = Objects.requireNonNull(secret, "app.jwt.secret must be configured");
+        byte[] bytes = configuredSecret.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length < 32) {
+            throw new IllegalStateException("app.jwt.secret must be at least 32 bytes for HS256");
+        }
         return new SecretKeySpec(bytes, "HmacSHA256");
     }
 }

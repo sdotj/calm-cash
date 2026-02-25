@@ -2,19 +2,20 @@ package com.samjenkins.auth_service.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public final class AuthDtos {
     private AuthDtos() {}
 
     public record RegisterRequest(
-        @Email @NotBlank String email,
-        @NotBlank String password,
-        @NotBlank String displayName
+        @Email @NotBlank @Size(max = 254) String email,
+        @NotBlank @Size(min = 12, max = 128) String password,
+        @NotBlank @Size(max = 100) String displayName
     ) {}
 
     public record LoginRequest(
-        @Email @NotBlank String email,
-        @NotBlank String password
+        @Email @NotBlank @Size(max = 254) String email,
+        @NotBlank @Size(min = 12, max = 128) String password
     ) {}
 
     public record RefreshRequest(@NotBlank String refreshToken) {}

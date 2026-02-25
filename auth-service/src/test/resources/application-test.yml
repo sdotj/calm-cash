@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:authdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;INIT=CREATE SCHEMA IF NOT EXISTS auth
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: auth
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    create-schemas: true
+    schemas: auth
+    default-schema: auth
+    locations: classpath:db/migration-h2
+
+app:
+  jwt:
+    issuer: "budgeting-auth-test"
+    audience: "budgeting-api-test"
+    secret: "0123456789abcdef0123456789abcdef"
+    access-token-minutes: 15
+    refresh-token-days: 14
+
+logging:
+  level:
+    org.springframework.security: WARN

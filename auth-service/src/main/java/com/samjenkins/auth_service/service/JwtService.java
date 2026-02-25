@@ -4,9 +4,12 @@ import com.samjenkins.auth_service.config.JwtProperties;
 import com.samjenkins.auth_service.entity.UserEntity;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwsHeader;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -26,6 +29,7 @@ public class JwtService {
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuer(props.issuer())
+            .audience(List.of(props.audience()))
             .issuedAt(now)
             .expiresAt(exp)
             .subject(user.getId().toString())
@@ -33,6 +37,7 @@ public class JwtService {
             .claim("name", user.getDisplayName())
             .build();
 
-        return encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+        JwsHeader jwsHeader = JwsHeader.with(MacAlgorithm.HS256).build();
+        return encoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 }

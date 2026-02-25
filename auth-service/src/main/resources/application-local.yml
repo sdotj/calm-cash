@@ -23,7 +23,8 @@ spring:
 app:
   jwt:
     issuer: "budgeting-auth"
-    secret: "${JWT_SECRET:dev-placeholder}"
+    audience: "budgeting-api"
+    secret: "${JWT_SECRET}"
     access-token-minutes: 15
     refresh-token-days: 14
 
@@ -36,3 +37,4 @@ management:
 logging:
   level:
     org.hibernate.SQL: info
+    org.springframework.security: INFO
