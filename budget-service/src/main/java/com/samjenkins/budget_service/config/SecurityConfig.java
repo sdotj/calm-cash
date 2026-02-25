@@ -1,0 +1,63 @@
+package com.samjenkins.budget_service.config;
+
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Value("${app.security.public-docs-enabled:false}")
+    private boolean publicDocsEnabled;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> {
+                auth.requestMatchers("/actuator/health", "/actuator/info").permitAll();
+                if (publicDocsEnabled) {
+                    auth.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll();
+                }
+                auth.anyRequest().authenticated();
+            })
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {}));
+
+        return http.build();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder(JwtProperties props) {
+        SecretKey key = new SecretKeySpec(props.secret().getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(key).build();
+        OAuth2TokenValidator<Jwt> defaultWithIssuer = JwtValidators.createDefaultWithIssuer(props.issuer());
+        OAuth2TokenValidator<Jwt> subjectIsUuid = jwt -> {
+            try {
+                UUID.fromString(jwt.getSubject());
+                return OAuth2TokenValidatorResult.success();
+            } catch (Exception ex) {
+                return OAuth2TokenValidatorResult.failure(
+                    new OAuth2Error("invalid_token", "JWT subject must be a UUID", null)
+                );
+            }
+        };
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(defaultWithIssuer, subjectIsUuid));
+        return decoder;
+    }
+}

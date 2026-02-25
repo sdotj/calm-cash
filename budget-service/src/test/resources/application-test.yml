@@ -1,0 +1,22 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: budget
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    schemas: budget
+    default-schema: budget
+    create-schemas: true
+    locations: classpath:db/migration
+
+app:
+  security:
+    public-docs-enabled: true
+  jwt:
+    issuer: "budgeting-auth"
+    secret: "test-jwt-secret-for-context-loads"
