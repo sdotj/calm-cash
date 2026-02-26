@@ -8,14 +8,22 @@ type AlertsPanelProps = {
 export function AlertsPanel({ alerts, onMarkAlertRead }: AlertsPanelProps) {
   return (
     <article className="panel">
-      <h3>Alerts</h3>
+      <div className="panel-head">
+        <h3>Alerts</h3>
+        <p>Important budget and system notices.</p>
+      </div>
+
       <div className="alerts-list">
         {alerts.map((alert) => (
           <div key={alert.id} className={`alert-row ${alert.readAt ? 'read' : ''}`}>
-            <div>
-              <p>{alert.message}</p>
-              <small>{new Date(alert.createdAt).toLocaleString()}</small>
+            <div className="alert-message-wrap">
+              <span className="alert-dot" aria-hidden="true" />
+              <div>
+                <p>{alert.message}</p>
+                <small>{new Date(alert.createdAt).toLocaleString()}</small>
+              </div>
             </div>
+
             {!alert.readAt ? (
               <button className="quiet-btn" onClick={() => void onMarkAlertRead(alert.id)} type="button">
                 Mark Read
@@ -25,7 +33,8 @@ export function AlertsPanel({ alerts, onMarkAlertRead }: AlertsPanelProps) {
             )}
           </div>
         ))}
-        {!alerts.length ? <p>No alerts. You are on track.</p> : null}
+
+        {!alerts.length ? <p className="empty-state">No alerts. You are on track.</p> : null}
       </div>
     </article>
   )

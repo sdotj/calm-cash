@@ -35,14 +35,19 @@ export function TransactionFormPanel({
   onAddTransaction,
 }: TransactionFormPanelProps) {
   return (
-    <article className="panel">
-      <h3>Quick Transaction</h3>
+    <article className="panel panel-emphasis">
+      <div className="panel-head">
+        <h3>Add Transaction</h3>
+        <p>Capture spending quickly to keep totals accurate.</p>
+      </div>
+
       <form onSubmit={(event) => void onAddTransaction(event)} className="stack-form">
         <label>
           Merchant
           <input
             value={newTxnMerchant}
             onChange={(event) => onNewTxnMerchantChange(event.target.value)}
+            placeholder="Ex: Trader Joe's"
             maxLength={255}
             required
           />
@@ -53,6 +58,7 @@ export function TransactionFormPanel({
           <input
             value={newTxnDescription}
             onChange={(event) => onNewTxnDescriptionChange(event.target.value)}
+            placeholder="Optional note"
             maxLength={1000}
           />
         </label>
@@ -64,6 +70,7 @@ export function TransactionFormPanel({
               type="number"
               inputMode="decimal"
               step="0.01"
+              placeholder="0.00"
               value={newTxnAmountDollars}
               onChange={(event) => onNewTxnAmountDollarsChange(event.target.value)}
               required

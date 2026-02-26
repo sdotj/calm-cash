@@ -14,6 +14,10 @@ import type { AuthMode } from './types'
 import { toErrorMessage } from './utils/errors'
 
 function App() {
+  const [dashboardTheme, setDashboardTheme] = useState<'light' | 'dark'>(() => {
+    const storedTheme = window.localStorage.getItem('calm-cash-dashboard-theme')
+    return storedTheme === 'dark' ? 'dark' : 'light'
+  })
   const [authMode, setAuthMode] = useState<AuthMode>('login')
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState('')
@@ -106,11 +110,15 @@ function App() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      document.title = 'Calm Cash'
+      document.title = 'Calm Cash | Dashboard'
       return
     }
     document.title = authMode === 'register' ? 'Calm Cash | Create Account' : 'Calm Cash | Sign In'
   }, [authMode, isAuthenticated])
+
+  useEffect(() => {
+    window.localStorage.setItem('calm-cash-dashboard-theme', dashboardTheme)
+  }, [dashboardTheme])
 
   if (!isAuthenticated) {
     return (
@@ -135,60 +143,72 @@ function App() {
   }
 
   return (
-    <main className="dashboard-page">
-      <TopBar me={me} selectedMonth={selectedMonth} onSelectedMonthChange={setSelectedMonth} onLogout={logout} />
-
-      {globalError ? <p className="error-banner">{globalError}</p> : null}
-
-      <SummaryCards summary={summary} unreadAlertsCount={unreadAlertsCount} />
-
-      <section className="dashboard-grid">
-        <BudgetPanel
-          summary={summary}
-          categories={categories}
-          newCategoryName={newCategoryName}
-          newBudgetCategoryId={newBudgetCategoryId}
-          newBudgetLimitDollars={newBudgetLimitDollars}
-          onNewCategoryNameChange={setNewCategoryName}
-          onNewBudgetCategoryIdChange={setNewBudgetCategoryId}
-          onNewBudgetLimitDollarsChange={setNewBudgetLimitDollars}
-          onAddCategory={onAddCategory}
-          onSetBudget={onSetBudget}
+    <main className={`dashboard-page ${dashboardTheme === 'dark' ? 'theme-dark' : ''}`}>
+      <div className="dashboard-shell">
+        <TopBar
+          me={me}
+          selectedMonth={selectedMonth}
+          onSelectedMonthChange={setSelectedMonth}
+          onLogout={logout}
+          isDarkMode={dashboardTheme === 'dark'}
+          onToggleTheme={() => setDashboardTheme((theme) => (theme === 'dark' ? 'light' : 'dark'))}
         />
 
-        <TransactionFormPanel
-          categories={categories}
-          newTxnMerchant={newTxnMerchant}
-          newTxnDescription={newTxnDescription}
-          newTxnAmountDollars={newTxnAmountDollars}
-          newTxnDate={newTxnDate}
-          newTxnSource={newTxnSource}
-          newTxnCategoryId={newTxnCategoryId}
-          onNewTxnMerchantChange={setNewTxnMerchant}
-          onNewTxnDescriptionChange={setNewTxnDescription}
-          onNewTxnAmountDollarsChange={setNewTxnAmountDollars}
-          onNewTxnDateChange={setNewTxnDate}
-          onNewTxnSourceChange={setNewTxnSource}
-          onNewTxnCategoryIdChange={setNewTxnCategoryId}
-          onAddTransaction={onAddTransaction}
-        />
-      </section>
+        {globalError ? <p className="error-banner">{globalError}</p> : null}
 
-      <section className="dashboard-grid lower-grid">
-        <TransactionsPanel transactions={transactions} categoryNameById={categoryMap} />
-        <AlertsPanel alerts={alerts} onMarkAlertRead={onMarkAlertRead} />
-      </section>
+        <SummaryCards summary={summary} unreadAlertsCount={unreadAlertsCount} />
 
-      {appLoading ? <p className="loading-overlay">Syncing latest data...</p> : null}
+        <section className="dashboard-content">
+          <div className="dashboard-main-column">
+            <TransactionFormPanel
+              categories={categories}
+              newTxnMerchant={newTxnMerchant}
+              newTxnDescription={newTxnDescription}
+              newTxnAmountDollars={newTxnAmountDollars}
+              newTxnDate={newTxnDate}
+              newTxnSource={newTxnSource}
+              newTxnCategoryId={newTxnCategoryId}
+              onNewTxnMerchantChange={setNewTxnMerchant}
+              onNewTxnDescriptionChange={setNewTxnDescription}
+              onNewTxnAmountDollarsChange={setNewTxnAmountDollars}
+              onNewTxnDateChange={setNewTxnDate}
+              onNewTxnSourceChange={setNewTxnSource}
+              onNewTxnCategoryIdChange={setNewTxnCategoryId}
+              onAddTransaction={onAddTransaction}
+            />
 
-      <footer className="app-footer">
-        <p>
-          Signed in as <strong>{me?.email}</strong>
-        </p>
-        <p>
-          {budgets.length} budgets configured across {categories.length} categories.
-        </p>
-      </footer>
+            <TransactionsPanel transactions={transactions} categoryNameById={categoryMap} />
+          </div>
+
+          <aside className="dashboard-side-column">
+            <BudgetPanel
+              summary={summary}
+              categories={categories}
+              newCategoryName={newCategoryName}
+              newBudgetCategoryId={newBudgetCategoryId}
+              newBudgetLimitDollars={newBudgetLimitDollars}
+              onNewCategoryNameChange={setNewCategoryName}
+              onNewBudgetCategoryIdChange={setNewBudgetCategoryId}
+              onNewBudgetLimitDollarsChange={setNewBudgetLimitDollars}
+              onAddCategory={onAddCategory}
+              onSetBudget={onSetBudget}
+            />
+
+            <AlertsPanel alerts={alerts} onMarkAlertRead={onMarkAlertRead} />
+          </aside>
+        </section>
+
+        {appLoading ? <p className="loading-overlay">Syncing latest data...</p> : null}
+
+        <footer className="app-footer">
+          <p>
+            Signed in as <strong>{me?.email}</strong>
+          </p>
+          <p>
+            {budgets.length} budgets configured across {categories.length} categories.
+          </p>
+        </footer>
+      </div>
     </main>
   )
 }

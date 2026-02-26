@@ -9,13 +9,17 @@ type TransactionsPanelProps = {
 export function TransactionsPanel({ transactions, categoryNameById }: TransactionsPanelProps) {
   return (
     <article className="panel">
-      <h3>Recent Transactions</h3>
+      <div className="panel-head">
+        <h3>Recent Transactions</h3>
+        <p>Latest activity for the selected month.</p>
+      </div>
+
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
               <th>Date</th>
-              <th>Merchant</th>
+              <th>Details</th>
               <th>Category</th>
               <th>Amount</th>
             </tr>
@@ -24,14 +28,20 @@ export function TransactionsPanel({ transactions, categoryNameById }: Transactio
             {transactions.map((txn) => (
               <tr key={txn.id}>
                 <td>{new Date(txn.transactionDate).toLocaleDateString()}</td>
-                <td>{txn.merchant}</td>
+                <td>
+                  <div className="txn-merchant">{txn.merchant}</div>
+                  {txn.description ? <div className="txn-description">{txn.description}</div> : null}
+                </td>
                 <td>{txn.categoryId ? categoryNameById.get(txn.categoryId) ?? 'Unknown' : 'Uncategorized'}</td>
                 <td className={txn.amountCents < 0 ? 'money-negative' : 'money-positive'}>{formatCents(txn.amountCents)}</td>
               </tr>
             ))}
+
             {!transactions.length ? (
               <tr>
-                <td colSpan={4}>No transactions for this month.</td>
+                <td colSpan={4} className="empty-cell">
+                  No transactions for this month.
+                </td>
               </tr>
             ) : null}
           </tbody>
