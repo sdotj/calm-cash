@@ -3,21 +3,22 @@ package com.samjenkins.budget_service.service;
 import com.samjenkins.budget_service.dto.AlertResponse;
 import com.samjenkins.budget_service.entity.Alert;
 import com.samjenkins.budget_service.entity.AlertType;
+import com.samjenkins.budget_service.entity.Budget;
 import com.samjenkins.budget_service.exception.NotFoundException;
 import com.samjenkins.budget_service.repository.AlertRepository;
+import com.samjenkins.budget_service.repository.TxnRepository;
+import com.samjenkins.budget_service.repository.BudgetCategoryLimitRepository;
+import com.samjenkins.budget_service.repository.BudgetMemberRepository;
 import com.samjenkins.budget_service.repository.BudgetRepository;
 import com.samjenkins.budget_service.repository.CategoryRepository;
-import com.samjenkins.budget_service.repository.TxnRepository;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.YearMonth;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -28,37 +29,66 @@ public class AlertService {
     private static final int MAX_LIMIT = 200;
 
     private final AlertRepository alertRepository;
-    private final BudgetRepository budgetRepository;
-    private final CategoryRepository categoryRepository;
     private final TxnRepository txnRepository;
+    private final BudgetRepository budgetRepository;
+    private final BudgetMemberRepository budgetMemberRepository;
+    private final BudgetCategoryLimitRepository budgetCategoryLimitRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Transactional
-    public void evaluateBudgetThresholds(UUID userId, UUID categoryId, YearMonth month) {
-        var budgetOpt = budgetRepository.findByUserIdAndMonthAndCategoryId(userId, month.atDay(1), categoryId);
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void evaluateBudgetThresholdsForBudget(UUID budgetId, UUID categoryId) {
+        var budgetOpt = budgetRepository.findById(budgetId);
         if (budgetOpt.isEmpty()) {
             return;
         }
 
-        long limitCents = budgetOpt.get().getLimitCents();
-        LocalDate start = month.atDay(1);
-        LocalDate end = month.atEndOfMonth();
-        long spentCents = txnRepository.sumCategoryExpenses(userId, categoryId, start, end);
+        var limitOpt = budgetCategoryLimitRepository.findByBudgetIdAndCategoryId(budgetId, categoryId);
+        if (limitOpt.isEmpty()) {
+            return;
+        }
 
+        long limitCents = limitOpt.get().getLimitCents();
+        long spentCents = txnRepository.sumCategoryExpensesByBudget(budgetId, categoryId);
         if (spentCents <= 0 || limitCents <= 0) {
             return;
         }
 
+        Budget budget = budgetOpt.get();
         double usagePct = (spentCents * 100.0) / limitCents;
-        String categoryName = categoryRepository.findByIdAndUserId(categoryId, userId)
+        String categoryName = categoryRepository.findById(categoryId)
             .map(c -> c.getName())
             .orElse("Category");
-        LocalDate monthDate = month.atDay(1);
+        java.util.Set<UUID> recipients = new java.util.HashSet<>();
+        recipients.add(budget.getOwnerUserId());
+        budgetMemberRepository.findAllByBudgetIdOrderByCreatedAtAsc(budgetId).stream()
+            .map(m -> m.getUserId())
+            .forEach(recipients::add);
 
         if (usagePct >= 80.0) {
-            createBudgetAlertIfAbsent(userId, categoryId, monthDate, AlertType.BUDGET_80, 80, budgetMessage(categoryName, month, 80));
+            for (UUID recipient : recipients) {
+                createBudgetAlertIfAbsentForBudget(
+                    recipient,
+                    budgetId,
+                    categoryId,
+                    budget.getStartDate(),
+                    AlertType.BUDGET_80,
+                    80,
+                    budgetMessageForBudget(categoryName, budget.getName(), 80)
+                );
+            }
         }
         if (usagePct >= 100.0) {
-            createBudgetAlertIfAbsent(userId, categoryId, monthDate, AlertType.BUDGET_100, 100, budgetMessage(categoryName, month, 100));
+            for (UUID recipient : recipients) {
+                createBudgetAlertIfAbsentForBudget(
+                    recipient,
+                    budgetId,
+                    categoryId,
+                    budget.getStartDate(),
+                    AlertType.BUDGET_100,
+                    100,
+                    budgetMessageForBudget(categoryName, budget.getName(), 100)
+                );
+            }
         }
     }
 
@@ -82,32 +112,34 @@ public class AlertService {
         return toResponse(alert);
     }
 
-    private void createBudgetAlertIfAbsent(
+    private void createBudgetAlertIfAbsentForBudget(
         UUID userId,
+        UUID budgetId,
         UUID categoryId,
         LocalDate month,
         AlertType type,
         int thresholdPct,
         String message
     ) {
-        if (alertRepository.existsByUserIdAndTypeAndCategoryIdAndMonthAndThresholdPct(
-            userId, type, categoryId, month, thresholdPct)) {
+        if (alertRepository.existsByUserIdAndTypeAndBudgetIdAndCategoryIdAndThresholdPct(
+            userId, type, budgetId, categoryId, thresholdPct)) {
             return;
         }
+
         alertRepository.save(Alert.builder()
             .id(UUID.randomUUID())
             .userId(userId)
             .type(type)
             .message(message)
+            .budgetId(budgetId)
             .categoryId(categoryId)
             .month(month)
             .thresholdPct(thresholdPct)
             .build());
     }
 
-    private String budgetMessage(String categoryName, YearMonth month, int threshold) {
-        String monthLabel = month.getMonth().getDisplayName(TextStyle.FULL, Locale.US) + " " + month.getYear();
-        return categoryName + " reached " + threshold + "% of your " + monthLabel + " budget";
+    private String budgetMessageForBudget(String categoryName, String budgetName, int threshold) {
+        return categoryName + " reached " + threshold + "% of your " + budgetName + " budget";
     }
 
     private AlertResponse toResponse(Alert alert) {

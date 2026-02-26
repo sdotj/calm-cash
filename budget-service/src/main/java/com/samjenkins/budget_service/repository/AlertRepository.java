@@ -18,6 +18,14 @@ public interface AlertRepository extends JpaRepository<Alert, UUID> {
         Integer thresholdPct
     );
 
+    boolean existsByUserIdAndTypeAndBudgetIdAndCategoryIdAndThresholdPct(
+        UUID userId,
+        AlertType type,
+        UUID budgetId,
+        UUID categoryId,
+        Integer thresholdPct
+    );
+
     List<Alert> findAllByUserIdOrderByCreatedAtDesc(UUID userId, Pageable pageable);
 
     List<Alert> findAllByUserIdAndReadAtIsNullOrderByCreatedAtDesc(UUID userId, Pageable pageable);

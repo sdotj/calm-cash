@@ -40,6 +40,9 @@ public class Alert {
     @Column(name = "category_id")
     private UUID categoryId;
 
+    @Column(name = "budget_id")
+    private UUID budgetId;
+
     @Column(name = "month")
     private LocalDate month;
 

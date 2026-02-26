@@ -2,10 +2,8 @@ package com.samjenkins.budget_service.repository.projection;
 
 import java.util.UUID;
 
-public interface CategoryExpenseProjection {
+public interface BudgetCategorySpendProjection {
     UUID getCategoryId();
-
-    String getCategoryName();
 
     long getSpentCents();
 }

@@ -120,6 +120,17 @@ function App() {
     window.localStorage.setItem('calm-cash-dashboard-theme', dashboardTheme)
   }, [dashboardTheme])
 
+  useEffect(() => {
+    const enableGlobalDark = isAuthenticated && dashboardTheme === 'dark'
+    document.documentElement.classList.toggle('dashboard-theme-dark', enableGlobalDark)
+    document.body.classList.toggle('dashboard-theme-dark', enableGlobalDark)
+
+    return () => {
+      document.documentElement.classList.remove('dashboard-theme-dark')
+      document.body.classList.remove('dashboard-theme-dark')
+    }
+  }, [dashboardTheme, isAuthenticated])
+
   if (!isAuthenticated) {
     return (
       <AuthScreen

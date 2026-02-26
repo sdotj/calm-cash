@@ -2,11 +2,8 @@ package com.samjenkins.budget_service.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -21,39 +18,30 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "transactions")
-public class Txn {
+@Table(name = "budget_category_limits")
+public class BudgetCategoryLimit {
 
     @Id
     private UUID id;
 
+    @Column(name = "budget_id", nullable = false)
+    private UUID budgetId;
+
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
-    @Column(name = "category_id")
+    @Column(name = "category_id", nullable = false)
     private UUID categoryId;
 
-    @Column(name = "budget_id")
-    private UUID budgetId;
+    @Column(name = "limit_cents", nullable = false)
+    private long limitCents;
 
-    @Column(nullable = false)
-    private String merchant;
-
-    private String description;
-
-    @Column(name = "amount_cents", nullable = false)
-    private long amountCents;
-
-    @Column(name = "transaction_date", nullable = false)
-    private LocalDate transactionDate;
+    @Column(name = "color_hex")
+    private String colorHex;
 
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at", nullable = false, insertable = false)
     private OffsetDateTime updatedAt;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private TransactionSource source;
 }

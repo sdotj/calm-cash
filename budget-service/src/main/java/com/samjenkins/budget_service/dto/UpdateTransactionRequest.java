@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 public record UpdateTransactionRequest(
+    UUID budgetId,
     UUID categoryId,
     @Size(max = 255) String merchant,
     @Size(max = 1000) String description,

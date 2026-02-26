@@ -20,3 +20,14 @@ body {
   color: #143615;
   background-color: #ffffff;
 }
+
+html,
+body {
+  transition: background-color 240ms ease, color 240ms ease;
+}
+
+html.dashboard-theme-dark,
+body.dashboard-theme-dark {
+  background-color: #0a130e;
+  color: #e5f4dd;
+}

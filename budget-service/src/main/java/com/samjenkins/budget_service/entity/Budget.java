@@ -2,6 +2,8 @@ package com.samjenkins.budget_service.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
@@ -19,24 +21,38 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "budgets")
+@Table(name = "budget_plans")
 public class Budget {
 
     @Id
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @Column(name = "owner_user_id", nullable = false)
+    private UUID ownerUserId;
 
     @Column(nullable = false)
-    private LocalDate month;
+    private String name;
 
-    @Column(name = "category_id", nullable = false)
-    private UUID categoryId;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "period_type", nullable = false)
+    private BudgetPeriodType periodType;
 
-    @Column(name = "limit_cents", nullable = false)
-    private long limitCents;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
+
+    @Column(name = "end_date", nullable = false)
+    private LocalDate endDate;
+
+    @Column(nullable = false, length = 3)
+    private String currency;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private BudgetStatus status;
 
     @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private OffsetDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false, insertable = false)
+    private OffsetDateTime updatedAt;
 }

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public record TransactionResponse(
     UUID id,
+    UUID budgetId,
     UUID categoryId,
     String merchant,
     String description,

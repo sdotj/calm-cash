@@ -1,66 +1,76 @@
 package com.samjenkins.budget_service.repository;
 
 import com.samjenkins.budget_service.entity.Txn;
-import com.samjenkins.budget_service.repository.projection.CategoryExpenseProjection;
+import com.samjenkins.budget_service.repository.projection.BudgetCategorySpendProjection;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface TxnRepository extends JpaRepository<Txn, UUID> {
-    Optional<Txn> findByIdAndUserId(UUID id, UUID userId);
+    Optional<Txn> findByIdAndBudgetId(UUID id, UUID budgetId);
 
-    List<Txn> findAllByUserIdAndTransactionDateBetweenOrderByTransactionDateDescCreatedAtDesc(
-        UUID userId,
+    List<Txn> findAllByBudgetIdAndTransactionDateBetweenOrderByTransactionDateDescCreatedAtDesc(
+        UUID budgetId,
         LocalDate start,
-        LocalDate end
+        LocalDate end,
+        Pageable pageable
     );
+
+    List<Txn> findAllByBudgetIdAndCategoryIdAndTransactionDateBetweenOrderByTransactionDateDescCreatedAtDesc(
+        UUID budgetId,
+        UUID categoryId,
+        LocalDate start,
+        LocalDate end,
+        Pageable pageable
+    );
+
+    @Query("""
+        select t.categoryId as categoryId, coalesce(sum(-t.amountCents), 0) as spentCents
+        from Txn t
+        where t.budgetId = :budgetId
+          and t.categoryId is not null
+          and t.amountCents < 0
+        group by t.categoryId
+        """)
+    List<BudgetCategorySpendProjection> summarizeBudgetCategoryExpenses(@Param("budgetId") UUID budgetId);
 
     @Query("""
         select coalesce(sum(case when t.amountCents > 0 then t.amountCents else 0 end), 0)
         from Txn t
-        where t.userId = :userId and t.transactionDate between :start and :end
+        where t.budgetId = :budgetId
         """)
-    long sumIncomeByMonth(@Param("userId") UUID userId, @Param("start") LocalDate start, @Param("end") LocalDate end);
+    long sumIncomeByBudget(@Param("budgetId") UUID budgetId);
 
     @Query("""
         select coalesce(sum(case when t.amountCents < 0 then -t.amountCents else 0 end), 0)
         from Txn t
-        where t.userId = :userId and t.transactionDate between :start and :end
+        where t.budgetId = :budgetId
         """)
-    long sumExpensesByMonth(@Param("userId") UUID userId, @Param("start") LocalDate start, @Param("end") LocalDate end);
+    long sumExpensesByBudget(@Param("budgetId") UUID budgetId);
 
     @Query("""
         select coalesce(sum(-t.amountCents), 0)
         from Txn t
-        where t.userId = :userId
-          and t.categoryId = :categoryId
-          and t.transactionDate between :start and :end
+        where t.budgetId = :budgetId
+          and t.categoryId is null
           and t.amountCents < 0
         """)
-    long sumCategoryExpenses(
-        @Param("userId") UUID userId,
-        @Param("categoryId") UUID categoryId,
-        @Param("start") LocalDate start,
-        @Param("end") LocalDate end
-    );
+    long sumUncategorizedExpensesByBudget(@Param("budgetId") UUID budgetId);
 
     @Query("""
-        select t.categoryId as categoryId, c.name as categoryName, coalesce(sum(-t.amountCents), 0) as spentCents
+        select coalesce(sum(-t.amountCents), 0)
         from Txn t
-        left join Category c on c.id = t.categoryId and c.userId = t.userId
-        where t.userId = :userId
-          and t.transactionDate between :start and :end
+        where t.budgetId = :budgetId
+          and t.categoryId = :categoryId
           and t.amountCents < 0
-        group by t.categoryId, c.name
-        order by spentCents desc
         """)
-    List<CategoryExpenseProjection> summarizeCategoryExpenses(
-        @Param("userId") UUID userId,
-        @Param("start") LocalDate start,
-        @Param("end") LocalDate end
+    long sumCategoryExpensesByBudget(
+        @Param("budgetId") UUID budgetId,
+        @Param("categoryId") UUID categoryId
     );
 }
