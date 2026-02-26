@@ -1,4 +1,4 @@
-import type { MeResponse } from '../types'
+import type { MeResponse } from '../../../types'
 
 type TopBarProps = {
   me: MeResponse | null

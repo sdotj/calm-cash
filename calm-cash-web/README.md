@@ -14,8 +14,9 @@ React + TypeScript frontend for the Calm Cash portfolio project.
 
 ## Project structure
 
-- `src/components`: reusable UI components
-- `src/hooks`: stateful orchestration (`useAuth`, `useDashboard`)
+- `src/features/auth`: auth feature modules (screen, form, hook, validation)
+- `src/features/dashboard`: dashboard feature modules (components + data hook)
+- `src/components/shared`: shared, reusable UI primitives (`SegmentedTabs`)
 - `src/api`: backend API client modules
 - `src/config`: runtime config/environment validation
 - `src/utils`: formatting and error helpers
@@ -69,4 +70,10 @@ Lint:
 
 ```bash
 npm run lint
+```
+
+E2E:
+
+```bash
+npm run e2e
 ```

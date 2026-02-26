@@ -1,4 +1,4 @@
-import type { Alert } from '../types'
+import type { Alert } from '../../../types'
 
 type AlertsPanelProps = {
   alerts: Alert[]

@@ -1,5 +1,5 @@
-import type { MonthlySummary } from '../types'
-import { formatCents } from '../utils/format'
+import type { MonthlySummary } from '../../../types'
+import { formatCents } from '../../../utils/format'
 
 type SummaryCardsProps = {
   summary: MonthlySummary | null

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import * as authApi from '../api/auth'
-import type { AuthMode, AuthResponse, MeResponse } from '../types'
-import { isUnauthorizedError } from '../utils/errors'
+import * as authApi from '../../../api/auth'
+import type { AuthMode, AuthResponse, MeResponse } from '../../../types'
+import { isUnauthorizedError } from '../../../utils/errors'
 
 const TOKEN_KEY = 'calm_cash_auth'
 

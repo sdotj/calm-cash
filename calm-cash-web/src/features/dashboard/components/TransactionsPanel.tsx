@@ -1,5 +1,5 @@
-import type { Txn } from '../types'
-import { formatCents } from '../utils/format'
+import type { Txn } from '../../../types'
+import { formatCents } from '../../../utils/format'
 
 type TransactionsPanelProps = {
   transactions: Txn[]

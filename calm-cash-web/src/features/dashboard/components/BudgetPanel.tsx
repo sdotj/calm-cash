@@ -1,6 +1,6 @@
 import type { FormEvent } from 'react'
-import type { Category, MonthlySummary } from '../types'
-import { formatCents } from '../utils/format'
+import type { Category, MonthlySummary } from '../../../types'
+import { formatCents } from '../../../utils/format'
 
 type BudgetPanelProps = {
   summary: MonthlySummary | null

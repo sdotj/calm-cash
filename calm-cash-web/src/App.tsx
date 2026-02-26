@@ -1,15 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import './App.css'
-import { AlertsPanel } from './components/AlertsPanel'
-import { AuthScreen } from './components/AuthScreen'
-import { BudgetPanel } from './components/BudgetPanel'
-import { SummaryCards } from './components/SummaryCards'
-import { TopBar } from './components/TopBar'
-import { TransactionFormPanel } from './components/TransactionFormPanel'
-import { TransactionsPanel } from './components/TransactionsPanel'
-import { useAuth } from './hooks/useAuth'
-import { useDashboard } from './hooks/useDashboard'
+import { AlertsPanel } from './features/dashboard/components/AlertsPanel'
+import { AuthScreen } from './features/auth/components/AuthScreen'
+import { BudgetPanel } from './features/dashboard/components/BudgetPanel'
+import { SummaryCards } from './features/dashboard/components/SummaryCards'
+import { TopBar } from './features/dashboard/components/TopBar'
+import { TransactionFormPanel } from './features/dashboard/components/TransactionFormPanel'
+import { TransactionsPanel } from './features/dashboard/components/TransactionsPanel'
+import { useAuth } from './features/auth/hooks/useAuth'
+import { useDashboard } from './features/dashboard/hooks/useDashboard'
 import type { AuthMode } from './types'
 import { toErrorMessage } from './utils/errors'
 
@@ -17,9 +17,11 @@ function App() {
   const [authMode, setAuthMode] = useState<AuthMode>('login')
   const [authLoading, setAuthLoading] = useState(false)
   const [authError, setAuthError] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [displayName, setDisplayName] = useState('')
+  const [loginEmail, setLoginEmail] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [registerEmail, setRegisterEmail] = useState('')
+  const [registerPassword, setRegisterPassword] = useState('')
+  const [registerDisplayName, setRegisterDisplayName] = useState('')
 
   const { isAuthenticated, me, setMe, authenticate, logout, withValidAccess, clearSession } = useAuth()
 
@@ -70,13 +72,45 @@ function App() {
     setAuthError('')
 
     try {
-      await authenticate(authMode, { email, password, displayName })
+      if (authMode === 'login') {
+        await authenticate('login', {
+          email: loginEmail,
+          password: loginPassword,
+          displayName: '',
+        })
+      } else {
+        await authenticate('register', {
+          email: registerEmail,
+          password: registerPassword,
+          displayName: registerDisplayName,
+        })
+      }
     } catch (error) {
-      setAuthError(toErrorMessage(error, 'Unable to authenticate. Please try again.'))
+      setAuthError(
+        toErrorMessage(
+          error,
+          authMode === 'register'
+            ? 'We could not create your account. Please review your details and try again.'
+            : 'We could not sign you in. Please check your credentials and try again.',
+        ),
+      )
     } finally {
       setAuthLoading(false)
     }
   }
+
+  function handleAuthModeChange(mode: AuthMode) {
+    setAuthMode(mode)
+    setAuthError('')
+  }
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      document.title = 'Calm Cash'
+      return
+    }
+    document.title = authMode === 'register' ? 'Calm Cash | Create Account' : 'Calm Cash | Sign In'
+  }, [authMode, isAuthenticated])
 
   if (!isAuthenticated) {
     return (
@@ -84,13 +118,17 @@ function App() {
         authMode={authMode}
         authLoading={authLoading}
         authError={authError}
-        email={email}
-        password={password}
-        displayName={displayName}
-        onAuthModeChange={setAuthMode}
-        onEmailChange={setEmail}
-        onPasswordChange={setPassword}
-        onDisplayNameChange={setDisplayName}
+        loginEmail={loginEmail}
+        loginPassword={loginPassword}
+        registerEmail={registerEmail}
+        registerPassword={registerPassword}
+        registerDisplayName={registerDisplayName}
+        onAuthModeChange={handleAuthModeChange}
+        onLoginEmailChange={setLoginEmail}
+        onLoginPasswordChange={setLoginPassword}
+        onRegisterEmailChange={setRegisterEmail}
+        onRegisterPasswordChange={setRegisterPassword}
+        onRegisterDisplayNameChange={setRegisterDisplayName}
         onSubmit={onAuthSubmit}
       />
     )

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import * as authApi from '../api/auth'
-import * as budgetApi from '../api/budget'
-import type { Alert, Budget, Category, MeResponse, MonthlySummary, TransactionSource, Txn } from '../types'
-import { currentDateInputValue, currentMonthInputValue, dollarsToCents, formatMonthToApi } from '../utils/format'
-import { isUnauthorizedError, toErrorMessage } from '../utils/errors'
+import * as authApi from '../../../api/auth'
+import * as budgetApi from '../../../api/budget'
+import type { Alert, Budget, Category, MeResponse, MonthlySummary, TransactionSource, Txn } from '../../../types'
+import { currentDateInputValue, currentMonthInputValue, dollarsToCents, formatMonthToApi } from '../../../utils/format'
+import { isUnauthorizedError, toErrorMessage } from '../../../utils/errors'
 
 type UseDashboardParams = {
   isAuthenticated: boolean

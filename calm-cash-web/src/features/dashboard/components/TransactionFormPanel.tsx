@@ -1,5 +1,5 @@
 import type { FormEvent } from 'react'
-import type { Category, TransactionSource } from '../types'
+import type { Category, TransactionSource } from '../../../types'
 
 type TransactionFormPanelProps = {
   categories: Category[]
