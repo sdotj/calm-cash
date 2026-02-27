@@ -65,7 +65,7 @@ export function BudgetPanel({ summary, onCreateBudgetClick, controls }: BudgetPa
 
         <div className="quick-actions-inline flex flex-wrap items-center justify-end gap-1.5 max-[980px]:justify-start">
           {controls ? <div className="budget-panel-controls flex items-center gap-2 max-[980px]:w-full">{controls}</div> : null}
-          <button className="primary-btn" type="button" onClick={onCreateBudgetClick}>
+          <button className="primary-btn inline-flex h-[42px] items-center justify-center px-4 text-[0.92rem]" type="button" onClick={onCreateBudgetClick}>
             {hasBudget ? 'Create Another Budget' : 'Create Budget'}
           </button>
         </div>

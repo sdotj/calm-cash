@@ -59,7 +59,7 @@ export function MonthPicker({ value, onChange }: MonthPickerProps) {
   return (
     <div className="month-picker" ref={rootRef}>
       <button className="dashboard-control-btn" type="button" onClick={() => setIsOpen((open) => !open)} aria-expanded={isOpen}>
-        <span>{triggerLabel}</span>
+        <span className="month-trigger-label">{triggerLabel}</span>
         <svg viewBox="0 0 24 24" aria-hidden="true" className="month-trigger-icon">
           <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1Zm12 8H5v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8ZM6 6a1 1 0 0 0-1 1v1h14V7a1 1 0 0 0-1-1H6Z" />
         </svg>

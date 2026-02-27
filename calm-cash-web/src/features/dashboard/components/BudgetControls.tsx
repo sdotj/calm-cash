@@ -21,14 +21,21 @@ export function BudgetControls({
   return (
     <>
       <MonthPicker value={selectedMonth} onChange={onMonthChange} />
-      <select className="dashboard-control-select budget-control" value={budgetSelectValue} onChange={(event) => onBudgetChange(event.target.value)}>
-        {showEmptyOption && budgets.length === 0 ? <option value="">No budgets available</option> : null}
-        {budgets.map((budget) => (
-          <option key={budget.id} value={budget.id}>
-            {budget.name}
-          </option>
-        ))}
-      </select>
+      <div className="dashboard-select-wrap">
+        <select className="dashboard-control-select budget-control" value={budgetSelectValue} onChange={(event) => onBudgetChange(event.target.value)}>
+          {showEmptyOption && budgets.length === 0 ? <option value="">No budgets available</option> : null}
+          {budgets.map((budget) => (
+            <option key={budget.id} value={budget.id}>
+              {budget.name}
+            </option>
+          ))}
+        </select>
+        <span className="dashboard-select-chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="m7 10 5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+      </div>
     </>
   )
 }

@@ -144,24 +144,40 @@ export function DashboardPage({
         {globalError ? <p className="error-banner my-3 rounded-[var(--radius-sm)] border border-[#eab8b9] bg-[#fff5f5] px-3 py-2 font-semibold text-[var(--danger)]">{globalError}</p> : null}
 
         {!hasBudget ? (
-          <section className="dashboard-empty-state panel mt-4 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-1)] px-4 py-8 text-center shadow-[0_8px_18px_rgba(28,69,21,0.04)]">
-            <div className="dashboard-empty-controls mb-4 ml-auto flex w-max items-end justify-end gap-3 max-[980px]:ml-0 max-[980px]:w-full max-[980px]:items-stretch max-[980px]:gap-2">
-              <BudgetControls
-                selectedMonth={selectedMonth}
-                onMonthChange={onSelectedMonthChange}
-                budgetSelectValue={budgetSelectValue}
-                budgets={budgets}
-                onBudgetChange={onSelectedBudgetIdChange}
-              />
+          <section className="dashboard-empty-state panel mt-4 rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-1)] p-0 shadow-[0_8px_18px_rgba(28,69,21,0.04)]">
+            <div className="flex items-center justify-between gap-4 border-b border-[var(--line)] px-5 py-4 max-[980px]:flex-col max-[980px]:items-stretch max-[980px]:gap-3 max-[980px]:px-4">
+              <div>
+                <h2 className="m-0 text-[1.05rem] font-semibold text-[var(--ink-900)]">Budget Dashboard</h2>
+                <p className="mt-1 text-[0.84rem] text-[var(--ink-500)]">Pick a month and budget to continue.</p>
+              </div>
+
+              <div className="dashboard-empty-controls ml-auto flex w-max items-end justify-end gap-3 max-[980px]:ml-0 max-[980px]:w-full max-[980px]:items-stretch max-[980px]:gap-2">
+                <BudgetControls
+                  selectedMonth={selectedMonth}
+                  onMonthChange={onSelectedMonthChange}
+                  budgetSelectValue={budgetSelectValue}
+                  budgets={budgets}
+                  onBudgetChange={onSelectedBudgetIdChange}
+                />
+              </div>
             </div>
 
-            <h2 className="m-0">No budget created yet</h2>
-            <p className="mx-auto mb-4 mt-2 max-w-[56ch] text-[var(--ink-500)]">
-              Create your first budget to start tracking category spending and transaction flow.
-            </p>
-            <button className="primary-btn" type="button" onClick={onOpenCreateBudgetModal}>
-              Create Budget
-            </button>
+            <div className="mx-auto flex max-w-[560px] flex-col items-center px-5 py-9 text-center max-[980px]:px-4 max-[980px]:py-7">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-[#cfe6c0] bg-[#f3faed] text-[var(--brand)] shadow-[0_6px_14px_rgba(79,152,40,0.15)]">
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-7 w-7 fill-current">
+                  <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5V8H4V5.5Zm0 4h16v9A1.5 1.5 0 0 1 18.5 20h-13A1.5 1.5 0 0 1 4 18.5v-9Zm9.75 4.25a.75.75 0 1 1 0 1.5h-3v1a.75.75 0 0 1-1.5 0v-1h-1a.75.75 0 0 1 0-1.5h1v-1a.75.75 0 0 1 1.5 0v1h3Z" />
+                </svg>
+              </div>
+
+              <h3 className="m-0 text-[1.22rem] font-semibold text-[var(--ink-900)]">No budget for this timeframe</h3>
+              <p className="mt-2 max-w-[52ch] text-[0.92rem] leading-relaxed text-[var(--ink-500)]">
+                Create a budget for the selected month to unlock category insights, spending breakdowns, and transaction tracking.
+              </p>
+
+              <button className="primary-btn mt-6 inline-flex h-[42px] min-w-[180px] items-center justify-center px-4 text-[0.92rem]" type="button" onClick={onOpenCreateBudgetModal}>
+                Create Budget
+              </button>
+            </div>
           </section>
         ) : (
           <>

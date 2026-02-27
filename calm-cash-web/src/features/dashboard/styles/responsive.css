@@ -10,11 +10,18 @@
   }
 
   .dashboard-empty-controls > .month-picker,
+  .dashboard-empty-controls > .dashboard-select-wrap,
   .dashboard-empty-controls > .dashboard-control-select {
     flex: 1 1 0%;
     width: 50%;
     min-width: 0;
     max-width: 50%;
+  }
+
+  .dashboard-select-wrap {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
   }
 
   .dashboard-control-btn,
@@ -29,6 +36,12 @@
   }
 
   .month-trigger-icon {
+    width: 0.8rem;
+    height: 0.8rem;
+    right: 0.56rem;
+  }
+
+  .dashboard-select-chevron {
     width: 0.8rem;
     height: 0.8rem;
     right: 0.56rem;
