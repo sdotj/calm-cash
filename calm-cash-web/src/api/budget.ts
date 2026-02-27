@@ -2,6 +2,8 @@ import { BUDGET_BASE_URL } from '../config/env'
 import type {
   Alert,
   Budget,
+  BudgetPeriodType,
+  BudgetStatus,
   Category,
   MonthlySummary,
   TransactionSource,
@@ -14,6 +16,33 @@ function authHeaders(accessToken: string): HeadersInit {
     'Content-Type': 'application/json',
     Authorization: `Bearer ${accessToken}`,
   }
+}
+
+type ListBudgetsParams = {
+  periodType?: BudgetPeriodType
+  status?: BudgetStatus
+  startDateFrom?: string
+  startDateTo?: string
+}
+
+function toSearchParams(params: ListBudgetsParams): string {
+  const searchParams = new URLSearchParams()
+
+  if (params.periodType) {
+    searchParams.set('periodType', params.periodType)
+  }
+  if (params.status) {
+    searchParams.set('status', params.status)
+  }
+  if (params.startDateFrom) {
+    searchParams.set('startDateFrom', params.startDateFrom)
+  }
+  if (params.startDateTo) {
+    searchParams.set('startDateTo', params.startDateTo)
+  }
+
+  const query = searchParams.toString()
+  return query ? `?${query}` : ''
 }
 
 export function listCategories(accessToken: string): Promise<Category[]> {
@@ -30,22 +59,76 @@ export function createCategory(accessToken: string, name: string): Promise<Categ
   })
 }
 
-export function listBudgets(accessToken: string, month: string): Promise<Budget[]> {
-  return requestJson<Budget[]>(`${BUDGET_BASE_URL}/api/budgets?month=${month}`, {
+export function listBudgets(accessToken: string, params: ListBudgetsParams): Promise<Budget[]> {
+  return requestJson<Budget[]>(`${BUDGET_BASE_URL}/api/budgets${toSearchParams(params)}`, {
     headers: authHeaders(accessToken),
   })
 }
 
-export function upsertBudget(accessToken: string, month: string, categoryId: string, limitCents: number): Promise<Budget | null> {
-  return requestMaybeJson<Budget>(`${BUDGET_BASE_URL}/api/budgets/${month}/${categoryId}`, {
+export function createBudget(
+  accessToken: string,
+  payload: {
+    name: string
+    periodType: BudgetPeriodType
+    startDate: string
+    currency?: string
+    categoryLimits?: Array<{
+      categoryId: string
+      limitCents: number
+      colorHex?: string
+    }>
+  },
+): Promise<Budget | null> {
+  return requestMaybeJson<Budget>(`${BUDGET_BASE_URL}/api/budgets`, {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify(payload),
+  })
+}
+
+export function upsertBudgetCategoryLimit(
+  accessToken: string,
+  budgetId: string,
+  categoryId: string,
+  payload: {
+    limitCents: number
+    colorHex?: string
+  },
+): Promise<Budget | null> {
+  return requestMaybeJson<Budget>(`${BUDGET_BASE_URL}/api/budgets/${budgetId}/categories/${categoryId}`, {
     method: 'PUT',
     headers: authHeaders(accessToken),
-    body: JSON.stringify({ limitCents }),
+    body: JSON.stringify(payload),
   })
 }
 
-export function listTransactions(accessToken: string, month: string): Promise<Txn[]> {
-  return requestJson<Txn[]>(`${BUDGET_BASE_URL}/api/transactions?month=${month}`, {
+export function listBudgetTransactions(
+  accessToken: string,
+  budgetId: string,
+  params?: {
+    categoryId?: string
+    minDate?: string
+    maxDate?: string
+    limit?: number
+  },
+): Promise<Txn[]> {
+  const searchParams = new URLSearchParams()
+
+  if (params?.categoryId) {
+    searchParams.set('categoryId', params.categoryId)
+  }
+  if (params?.minDate) {
+    searchParams.set('minDate', params.minDate)
+  }
+  if (params?.maxDate) {
+    searchParams.set('maxDate', params.maxDate)
+  }
+  if (params?.limit) {
+    searchParams.set('limit', String(params.limit))
+  }
+
+  const query = searchParams.toString()
+  return requestJson<Txn[]>(`${BUDGET_BASE_URL}/api/budgets/${budgetId}/transactions${query ? `?${query}` : ''}`, {
     headers: authHeaders(accessToken),
   })
 }
@@ -53,6 +136,7 @@ export function listTransactions(accessToken: string, month: string): Promise<Tx
 export function createTransaction(
   accessToken: string,
   payload: {
+    budgetId: string
     categoryId: string | null
     merchant: string
     description: string | null
@@ -68,8 +152,8 @@ export function createTransaction(
   })
 }
 
-export function monthlySummary(accessToken: string, month: string): Promise<MonthlySummary> {
-  return requestJson<MonthlySummary>(`${BUDGET_BASE_URL}/api/monthly-summary?month=${month}`, {
+export function budgetSummary(accessToken: string, budgetId: string): Promise<MonthlySummary> {
+  return requestJson<MonthlySummary>(`${BUDGET_BASE_URL}/api/budgets/${budgetId}/summary`, {
     headers: authHeaders(accessToken),
   })
 }

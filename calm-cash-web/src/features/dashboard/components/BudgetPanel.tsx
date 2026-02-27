@@ -1,119 +1,149 @@
-import type { FormEvent } from 'react'
-import type { Category, MonthlySummary } from '../../../types'
+import type { ReactNode } from 'react'
+import { useMemo, useState } from 'react'
+import type { MonthlySummary } from '../../../types'
 import { formatCents } from '../../../utils/format'
 
 type BudgetPanelProps = {
   summary: MonthlySummary | null
-  categories: Category[]
-  newCategoryName: string
-  newBudgetCategoryId: string
-  newBudgetLimitDollars: string
-  onNewCategoryNameChange: (value: string) => void
-  onNewBudgetCategoryIdChange: (value: string) => void
-  onNewBudgetLimitDollarsChange: (value: string) => void
-  onAddCategory: (event: FormEvent) => Promise<void>
-  onSetBudget: (event: FormEvent) => Promise<void>
+  onCreateBudgetClick: () => void
+  controls?: ReactNode
 }
 
-export function BudgetPanel({
-  summary,
-  categories,
-  newCategoryName,
-  newBudgetCategoryId,
-  newBudgetLimitDollars,
-  onNewCategoryNameChange,
-  onNewBudgetCategoryIdChange,
-  onNewBudgetLimitDollarsChange,
-  onAddCategory,
-  onSetBudget,
-}: BudgetPanelProps) {
+const FALLBACK_COLORS = ['#F25F5C', '#3A86FF', '#FF9F1C', '#2EC4B6', '#8E7DBE', '#E76F51', '#43AA8B', '#FF006E']
+
+function hexToRgba(hex: string, alpha: number): string {
+  const sanitized = hex.replace('#', '')
+  if (sanitized.length !== 6) {
+    return `rgba(58, 134, 255, ${alpha})`
+  }
+
+  const red = Number.parseInt(sanitized.slice(0, 2), 16)
+  const green = Number.parseInt(sanitized.slice(2, 4), 16)
+  const blue = Number.parseInt(sanitized.slice(4, 6), 16)
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`
+}
+
+export function BudgetPanel({ summary, onCreateBudgetClick, controls }: BudgetPanelProps) {
+  const hasBudget = Boolean(summary)
+  const total = summary?.totalLimitCents ?? 0
+  const [hoveredCategoryId, setHoveredCategoryId] = useState<string | null>(null)
+
+  const hoveredCategory = useMemo(() => {
+    if (!summary || !hoveredCategoryId) {
+      return null
+    }
+    return summary.categories.find((category) => category.categoryId === hoveredCategoryId) ?? null
+  }, [hoveredCategoryId, summary])
+
+  const hoveredCategoryPositionPct = useMemo(() => {
+    if (!summary || !hoveredCategory) {
+      return null
+    }
+
+    let cumulativeLimit = 0
+    for (const category of summary.categories) {
+      const limit = Math.max(0, category.limitCents ?? 0)
+      if (category.categoryId === hoveredCategory.categoryId) {
+        const midpoint = cumulativeLimit + limit / 2
+        return total > 0 ? (midpoint / total) * 100 : 50
+      }
+      cumulativeLimit += limit
+    }
+
+    return 50
+  }, [hoveredCategory, summary, total])
+
   return (
-    <article className="panel">
-      <div className="panel-head">
-        <h3>Budgets</h3>
-        <p>Set category caps and check utilization at a glance.</p>
+    <article className="panel rounded-[var(--radius-md)] border border-[var(--line)] bg-[var(--surface-1)] p-4 shadow-[0_8px_18px_rgba(28,69,21,0.04)]">
+      <div className="panel-head panel-head-row flex items-start justify-between gap-3 max-[980px]:flex-col">
+        <div>
+          <h3 className="m-0">Budget Overview</h3>
+          <p className="mt-1 text-[0.86rem] text-[var(--ink-500)]">
+            {hasBudget ? 'Track category usage at a glance.' : 'Create a budget to start tracking spending.'}
+          </p>
+        </div>
+
+        <div className="quick-actions-inline flex flex-wrap items-center justify-end gap-1.5 max-[980px]:justify-start">
+          {controls ? <div className="budget-panel-controls flex items-center gap-2 max-[980px]:w-full">{controls}</div> : null}
+          <button className="primary-btn" type="button" onClick={onCreateBudgetClick}>
+            {hasBudget ? 'Create Another Budget' : 'Create Budget'}
+          </button>
+        </div>
       </div>
 
-      <div className="budget-actions">
-        <form onSubmit={(event) => void onAddCategory(event)} className="inline-form">
-          <input
-            value={newCategoryName}
-            onChange={(event) => onNewCategoryNameChange(event.target.value)}
-            placeholder="New category"
-            maxLength={100}
-          />
-          <button className="primary-btn" type="submit">
-            Add
-          </button>
-        </form>
+      {!hasBudget ? (
+        <p className="empty-state">No active budget selected for this month.</p>
+      ) : (
+        <>
+          <div className="budget-composition-wrap">
+            <div className="budget-composition" role="img" aria-label="Budget category composition">
+              {summary?.categories.map((category, index) => {
+                const limit = category.limitCents ?? 0
+                const widthPct = total > 0 ? (limit / total) * 100 : 0
+                const color = category.colorHex ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length]
+                const fillPct = Math.max(0, Math.min(100, category.utilizationPct ?? 0))
+                const fadedColor = hexToRgba(color, 0.28)
 
-        <form onSubmit={(event) => void onSetBudget(event)} className="inline-form inline-form-3">
-          <select value={newBudgetCategoryId} onChange={(event) => onNewBudgetCategoryIdChange(event.target.value)}>
-            <option value="">Category</option>
-            {categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-
-          <input
-            type="number"
-            inputMode="decimal"
-            step="0.01"
-            min="0"
-            placeholder="Budget $"
-            value={newBudgetLimitDollars}
-            onChange={(event) => onNewBudgetLimitDollarsChange(event.target.value)}
-          />
-
-          <button className="primary-btn" type="submit">
-            Set
-          </button>
-        </form>
-      </div>
-
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Budget</th>
-              <th>Spent</th>
-              <th>Usage</th>
-            </tr>
-          </thead>
-          <tbody>
-            {summary?.categories.map((row) => (
-              <tr key={row.categoryId}>
-                <td>{row.categoryName}</td>
-                <td>{row.budgetLimitCents ? formatCents(row.budgetLimitCents) : 'Not set'}</td>
-                <td>{formatCents(row.spentCents)}</td>
-                <td>
-                  {typeof row.utilizationPct === 'number' ? `${Math.round(row.utilizationPct)}%` : '-'}
-                  {row.budgetLimitCents ? (
-                    <div className="util-track">
-                      <span
-                        style={{
-                          width: `${Math.max(0, Math.min(100, row.utilizationPct ?? 0))}%`,
-                        }}
-                      />
-                    </div>
-                  ) : null}
-                </td>
-              </tr>
-            ))}
-
-            {!summary?.categories.length ? (
-              <tr>
-                <td colSpan={4} className="empty-cell">
-                  No categories yet. Add one to get started.
-                </td>
-              </tr>
+                return (
+                  <button
+                    key={category.categoryId}
+                    className={`budget-segment ${hoveredCategoryId === category.categoryId ? 'is-active' : ''}`}
+                    type="button"
+                    onMouseEnter={() => setHoveredCategoryId(category.categoryId)}
+                    onMouseLeave={() => setHoveredCategoryId(null)}
+                    onFocus={() => setHoveredCategoryId(category.categoryId)}
+                    onBlur={() => setHoveredCategoryId(null)}
+                    style={{
+                      width: `${Math.max(widthPct, 2)}%`,
+                      background: fadedColor,
+                    }}
+                    aria-label={`${category.categoryName}: ${Math.round(fillPct)} percent used`}
+                  >
+                    <span className="budget-segment-fill" style={{ width: `${fillPct}%`, background: color }} />
+                  </button>
+                )
+              })}
+            </div>
+            {hoveredCategory && hoveredCategoryPositionPct !== null ? (
+              <div className="budget-segment-tooltip" role="status" aria-live="polite">
+                <div
+                  className="budget-segment-tooltip-bubble"
+                  style={{
+                    left: `${hoveredCategoryPositionPct}%`,
+                  }}
+                >
+                  <strong>{hoveredCategory.categoryName}</strong>
+                  <span>
+                    {formatCents(hoveredCategory.spentCents)} of {formatCents(hoveredCategory.limitCents ?? 0)} spent
+                  </span>
+                  <span>
+                    {formatCents(hoveredCategory.remainingCents ?? 0)} remaining ({Math.round(hoveredCategory.utilizationPct ?? 0)}%)
+                  </span>
+                </div>
+              </div>
             ) : null}
-          </tbody>
-        </table>
-      </div>
+          </div>
+
+          <div className="budget-legend">
+            {summary?.categories.map((category, index) => {
+              const color = category.colorHex ?? FALLBACK_COLORS[index % FALLBACK_COLORS.length]
+
+              return (
+                <div key={category.categoryId} className="budget-legend-row">
+                  <span className="budget-legend-dot" style={{ background: color }} aria-hidden="true" />
+                  <div className="budget-legend-text">
+                    <strong>{category.categoryName}</strong>
+                    <small>
+                      {formatCents(category.spentCents)} / {formatCents(category.limitCents ?? 0)}
+                    </small>
+                  </div>
+                  <span className="budget-legend-pct">{Math.round(category.utilizationPct ?? 0)}%</span>
+                </div>
+              )
+            })}
+          </div>
+        </>
+      )}
     </article>
   )
 }

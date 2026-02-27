@@ -5,6 +5,7 @@ import calmCashLogo from '../../../assets/calm-cash-full.png'
 import { SegmentedTabs } from '../../../components/shared/SegmentedTabs'
 import { AuthForm } from './AuthForm'
 import { getFormValidation } from '../utils/validation'
+import '../styles/index.css'
 
 type AuthScreenProps = {
   authMode: AuthMode
@@ -114,7 +115,7 @@ export function AuthScreen({
   }
 
   return (
-    <main className="auth-screen">
+    <main className="auth-screen relative mx-auto grid min-h-screen max-w-[940px] content-center gap-4 bg-white px-4 py-5 max-[980px]:min-h-0 max-[980px]:grid-cols-1 max-[980px]:content-start max-[980px]:gap-3 max-[980px]:p-3">
       <div className="auth-currency-bg" aria-hidden="true">
         {Array.from({ length: 16 }).map((_, index) => (
           <span key={`currency-${index}`}>
@@ -122,12 +123,18 @@ export function AuthScreen({
           </span>
         ))}
       </div>
-      <section className="hero-panel">
-        <img className="hero-logo" src={calmCashLogo} alt="Calm Cash logo" />
-        <p className="hero-tagline">Budgeting. Stress-free.</p>
+      <section className="hero-panel flex h-[var(--auth-panel-height)] flex-col items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[#f4f8f1] p-4 shadow-[0_10px_24px_rgba(28,69,21,0.08)] max-[980px]:h-[264px] max-[980px]:p-3">
+        <img
+          className="hero-logo h-auto w-full max-w-[320px] drop-shadow-[0_6px_12px_rgba(18,56,13,0.12)] max-[980px]:max-w-[270px]"
+          src={calmCashLogo}
+          alt="Calm Cash logo"
+        />
+        <p className="hero-tagline m-0 text-center text-[clamp(1rem,1.7vw,1.25rem)] font-semibold tracking-[0.03em] text-[#2a6522] max-[980px]:text-base">
+          Budgeting. Stress-free.
+        </p>
       </section>
 
-      <section className="auth-card">
+      <section className="auth-card flex h-[var(--auth-panel-height)] flex-col justify-start overflow-visible rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-1)] px-4 py-3.5 shadow-[0_10px_24px_rgba(28,69,21,0.08)] max-[980px]:h-[392px] max-[980px]:p-3.5">
         <SegmentedTabs
           className="auth-switch"
           ariaLabel="Authentication mode"
@@ -147,7 +154,7 @@ export function AuthScreen({
           }}
         />
 
-        <div className="auth-forms-stage" aria-live="polite">
+        <div className="auth-forms-stage relative overflow-hidden" aria-live="polite">
           {leavingMode ? (
             <div
               className={`auth-form-panel is-leaving ${

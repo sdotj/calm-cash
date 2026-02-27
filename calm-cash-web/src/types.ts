@@ -1,5 +1,7 @@
 export type AuthMode = 'login' | 'register'
 export type TransactionSource = 'MANUAL' | 'PLAID' | 'IMPORT'
+export type BudgetPeriodType = 'WEEKLY' | 'MONTHLY'
+export type BudgetStatus = 'ACTIVE' | 'ARCHIVED'
 
 export type AuthResponse = {
   accessToken: string
@@ -20,14 +22,34 @@ export type Category = {
 
 export type Budget = {
   id: string
-  month: string
-  categoryId: string
-  limitCents: number
+  name: string
+  periodType: BudgetPeriodType
+  startDate: string
+  endDate: string
+  currency: string
+  status: BudgetStatus
+  totalLimitCents: number
   createdAt: string
+  updatedAt: string
+  categoryLimits: BudgetCategoryLimit[]
+}
+
+export type BudgetCategoryLimit = {
+  id: string
+  categoryId: string
+  categoryName: string
+  limitCents: number
+  colorHex: string | null
+  spentCents: number
+  remainingCents: number
+  utilizationPct: number | null
+  createdAt: string
+  updatedAt: string
 }
 
 export type Txn = {
   id: string
+  budgetId: string
   categoryId: string | null
   merchant: string
   description: string | null
@@ -41,13 +63,23 @@ export type Txn = {
 export type MonthlyCategorySummary = {
   categoryId: string
   categoryName: string
+  colorHex: string | null
+  limitCents: number | null
   spentCents: number
-  budgetLimitCents: number | null
+  remainingCents: number | null
   utilizationPct: number | null
 }
 
 export type MonthlySummary = {
-  month: string
+  budgetId: string
+  budgetName: string
+  periodType: BudgetPeriodType
+  startDate: string
+  endDate: string
+  totalLimitCents: number
+  totalSpentCents: number
+  totalRemainingCents: number
+  utilizationPct: number | null
   incomeCents: number
   expenseCents: number
   netCents: number

@@ -1,115 +1,52 @@
-import type { FormEvent } from 'react'
-import type { Category, TransactionSource } from '../../../types'
+import { formatCents } from '../../../utils/format'
 
 type TransactionFormPanelProps = {
-  categories: Category[]
-  newTxnMerchant: string
-  newTxnDescription: string
-  newTxnAmountDollars: string
-  newTxnDate: string
-  newTxnSource: TransactionSource
-  newTxnCategoryId: string
-  onNewTxnMerchantChange: (value: string) => void
-  onNewTxnDescriptionChange: (value: string) => void
-  onNewTxnAmountDollarsChange: (value: string) => void
-  onNewTxnDateChange: (value: string) => void
-  onNewTxnSourceChange: (value: TransactionSource) => void
-  onNewTxnCategoryIdChange: (value: string) => void
-  onAddTransaction: (event: FormEvent) => Promise<void>
+  hasBudget: boolean
+  budgetName: string
+  budgetPeriodLabel: string
+  totalSpentCents: number
+  totalRemainingCents: number
+  onAddTransactionClick: () => void
 }
 
 export function TransactionFormPanel({
-  categories,
-  newTxnMerchant,
-  newTxnDescription,
-  newTxnAmountDollars,
-  newTxnDate,
-  newTxnSource,
-  newTxnCategoryId,
-  onNewTxnMerchantChange,
-  onNewTxnDescriptionChange,
-  onNewTxnAmountDollarsChange,
-  onNewTxnDateChange,
-  onNewTxnSourceChange,
-  onNewTxnCategoryIdChange,
-  onAddTransaction,
+  hasBudget,
+  budgetName,
+  budgetPeriodLabel,
+  totalSpentCents,
+  totalRemainingCents,
+  onAddTransactionClick,
 }: TransactionFormPanelProps) {
   return (
-    <article className="panel panel-emphasis">
-      <div className="panel-head">
-        <h3>Add Transaction</h3>
-        <p>Capture spending quickly to keep totals accurate.</p>
+    <article className="panel panel-emphasis rounded-[var(--radius-md)] border border-[var(--line)] p-4 shadow-[0_8px_18px_rgba(28,69,21,0.04)]">
+      <div className="panel-head mb-3">
+        <h3 className="m-0">Current Budget</h3>
+        <p className="mt-1 text-[0.86rem] text-[var(--ink-500)]">{hasBudget ? budgetPeriodLabel : 'Select or create a budget to get started.'}</p>
       </div>
 
-      <form onSubmit={(event) => void onAddTransaction(event)} className="stack-form">
-        <label>
-          Merchant
-          <input
-            value={newTxnMerchant}
-            onChange={(event) => onNewTxnMerchantChange(event.target.value)}
-            placeholder="Ex: Trader Joe's"
-            maxLength={255}
-            required
-          />
-        </label>
-
-        <label>
-          Description
-          <input
-            value={newTxnDescription}
-            onChange={(event) => onNewTxnDescriptionChange(event.target.value)}
-            placeholder="Optional note"
-            maxLength={1000}
-          />
-        </label>
-
-        <div className="form-two-col">
-          <label>
-            Amount ($)
-            <input
-              type="number"
-              inputMode="decimal"
-              step="0.01"
-              placeholder="0.00"
-              value={newTxnAmountDollars}
-              onChange={(event) => onNewTxnAmountDollarsChange(event.target.value)}
-              required
-            />
-          </label>
-
-          <label>
-            Date
-            <input type="date" value={newTxnDate} onChange={(event) => onNewTxnDateChange(event.target.value)} required />
-          </label>
+      {hasBudget ? (
+        <div className="current-budget-meta">
+          <h4 className="mb-2 text-[1.04rem]">{budgetName}</h4>
+          <div className="current-budget-stats mb-4 grid grid-cols-2 gap-2.5">
+            <div className="rounded-[10px] border border-[#dcebd2] bg-[#fcfffa] px-2.5 py-2">
+              <span className="mb-0.5 block text-xs text-[var(--ink-500)]">Spent</span>
+              <strong>{formatCents(totalSpentCents)}</strong>
+            </div>
+            <div className="rounded-[10px] border border-[#dcebd2] bg-[#fcfffa] px-2.5 py-2">
+              <span className="mb-0.5 block text-xs text-[var(--ink-500)]">Remaining</span>
+              <strong className={totalRemainingCents < 0 ? 'money-negative' : 'money-positive'}>
+                {formatCents(totalRemainingCents)}
+              </strong>
+            </div>
+          </div>
         </div>
+      ) : (
+        <p className="empty-state">No budget currently selected.</p>
+      )}
 
-        <div className="form-two-col">
-          <label>
-            Source
-            <select value={newTxnSource} onChange={(event) => onNewTxnSourceChange(event.target.value as TransactionSource)}>
-              <option value="MANUAL">Manual</option>
-              <option value="PLAID">Plaid</option>
-              <option value="IMPORT">Import</option>
-            </select>
-          </label>
-
-          <label>
-            Category
-            <select value={newTxnCategoryId} onChange={(event) => onNewTxnCategoryIdChange(event.target.value)}>
-              <option value="">Uncategorized</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-
-        <button className="primary-btn" type="submit">
-          Add Transaction
-        </button>
-      </form>
+      <button className="primary-btn" type="button" onClick={onAddTransactionClick} disabled={!hasBudget}>
+        Add Transaction
+      </button>
     </article>
   )
 }

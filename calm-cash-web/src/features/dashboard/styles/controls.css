@@ -1,0 +1,157 @@
+
+.budget-control {
+  min-width: 180px;
+}
+
+.dashboard-control-btn,
+.dashboard-control-select {
+  width: 212px;
+  min-width: 212px;
+  height: 42px;
+  min-height: 42px;
+  border: 1px solid var(--brand);
+  border-radius: 999px;
+  background: var(--brand);
+  color: #fff;
+  padding: 0.58rem 0.88rem;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  box-shadow: 0 6px 14px rgba(79, 152, 40, 0.16);
+  box-sizing: border-box;
+}
+
+.dashboard-control-btn {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding-right: 2rem;
+}
+
+.dashboard-control-btn > span {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.month-trigger-icon {
+  position: absolute;
+  right: 0.72rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.95rem;
+  height: 0.95rem;
+  fill: currentColor;
+}
+
+.dashboard-control-btn:hover,
+.dashboard-control-select:hover {
+  border-color: var(--brand-strong);
+  background: var(--brand-strong);
+}
+
+.dashboard-control-btn:focus-visible,
+.dashboard-control-select:focus-visible {
+  outline: 2px solid rgba(209, 245, 183, 0.45);
+  border-color: var(--brand-strong);
+}
+
+.dashboard-control-select {
+  display: block;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2.15rem;
+  padding-left: 0.88rem;
+  background-image: linear-gradient(45deg, transparent 50%, #ffffff 50%), linear-gradient(135deg, #ffffff 50%, transparent 50%);
+  background-position: calc(100% - 16px) calc(50% - 2px), calc(100% - 11px) calc(50% - 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  text-align-last: center;
+}
+
+.month-picker {
+  position: relative;
+}
+
+.month-picker-popover {
+  position: absolute;
+  top: calc(100% + 0.42rem);
+  right: 0;
+  z-index: 12;
+  width: 248px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-1);
+  box-shadow: 0 16px 30px rgba(20, 54, 21, 0.2);
+  padding: 0.58rem;
+}
+
+.month-picker-head {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.375rem;
+}
+
+.month-picker-head strong {
+  font-size: 0.92rem;
+}
+
+.month-year-nav {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 0;
+}
+
+.month-year-nav svg {
+  width: 0.86rem;
+  height: 0.86rem;
+  color: currentColor;
+  overflow: visible;
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.375rem;
+}
+
+.month-chip {
+  cursor: pointer;
+  border-radius: 999px;
+  border-width: 1px;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border-color: #d7e8cd;
+  background: #fbfef9;
+  color: var(--ink-700);
+}
+
+.month-chip:hover {
+  border-color: #9fca88;
+}
+
+.month-chip.is-selected {
+  border-color: #68b531;
+  background: #68b531;
+  color: #fff;
+}
+
+.budget-panel-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

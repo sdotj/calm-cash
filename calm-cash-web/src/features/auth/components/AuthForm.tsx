@@ -50,8 +50,8 @@ export function AuthForm({
     passwordChecks.minLength && passwordChecks.upper && passwordChecks.lower && passwordChecks.number && passwordChecks.special
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="stack-form auth-form" noValidate>
-      <fieldset className="auth-fieldset" disabled={authLoading}>
+    <form onSubmit={(event) => void onSubmit(event)} className="stack-form auth-form grid gap-3.5 max-[980px]:gap-2" noValidate>
+      <fieldset className="auth-fieldset m-0 grid border-0 p-0" disabled={authLoading}>
         <label>
           Email
           <input
@@ -91,7 +91,7 @@ export function AuthForm({
 
         <label>
           Password
-          <div className="password-input-wrap">
+          <div className="password-input-wrap relative">
             <input
               type={isPasswordVisible ? 'text' : 'password'}
               minLength={12}
@@ -107,7 +107,7 @@ export function AuthForm({
             />
             <button
               type="button"
-              className="password-eye-btn"
+              className="password-eye-btn absolute right-1.5 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border-0 bg-transparent text-[#4f8646] hover:bg-[#edf7e8] focus-visible:bg-[#edf7e8] max-[980px]:h-6 max-[980px]:w-6"
               aria-label="Hold to show password"
               onPointerDown={onRevealPassword}
               onPointerUp={onHidePassword}
@@ -141,7 +141,7 @@ export function AuthForm({
         </button>
       </fieldset>
 
-      <div className="auth-feedback-slot" aria-live="polite">
+      <div className="auth-feedback-slot min-h-[3.2rem] max-[980px]:min-h-[1.7rem]" aria-live="polite">
         {authLoading ? (
           <p className="inline-info" role="status">
             {mode === 'register' ? 'Creating your account securely...' : 'Signing you in securely...'}

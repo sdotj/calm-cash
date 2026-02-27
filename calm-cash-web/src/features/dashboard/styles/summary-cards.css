@@ -1,0 +1,45 @@
+
+.summary-grid {
+  margin-top: 0.95rem;
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.stat-card {
+  position: relative;
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fcf5 100%);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  inset: 0.5rem auto auto 0.6rem;
+  width: 0.22rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #6cbc36, #4f9c2a);
+}
+
+.stat-card p {
+  margin: 0;
+  color: var(--ink-500);
+  font-size: 0.82rem;
+  padding-left: 0.55rem;
+}
+
+.stat-card h2 {
+  margin: 0.42rem 0 0;
+  font-size: clamp(1.2rem, 2.1vw, 1.6rem);
+}
+
+.stat-card small {
+  display: block;
+  margin-top: 0.28rem;
+  color: var(--ink-500);
+  font-size: 0.74rem;
+  font-weight: 700;
+}

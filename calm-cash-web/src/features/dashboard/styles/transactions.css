@@ -1,0 +1,39 @@
+.table-wrap {
+  overflow: auto;
+  border-radius: 10px;
+  border: 1px solid #e2f0d9;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 520px;
+}
+
+th,
+td {
+  text-align: left;
+  border-bottom: 1px solid #e7f2e1;
+  padding: 0.62rem;
+  font-size: 0.9rem;
+}
+
+th {
+  color: var(--ink-700);
+  font-weight: 700;
+  background: #f8fcf5;
+}
+
+.txn-merchant {
+  font-weight: 700;
+}
+
+.txn-description {
+  margin-top: 0.12rem;
+  color: var(--ink-500);
+  font-size: 0.78rem;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

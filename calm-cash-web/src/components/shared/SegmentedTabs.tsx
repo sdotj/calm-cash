@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import './segmented-tabs.css'
 
 type SegmentedTabItem<T extends string> = {
   id: T
