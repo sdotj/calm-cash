@@ -115,7 +115,7 @@ export function AuthScreen({
   }
 
   return (
-    <main className="auth-screen relative mx-auto grid min-h-screen max-w-[940px] content-center gap-4 bg-white px-4 py-5 max-[980px]:min-h-0 max-[980px]:grid-cols-1 max-[980px]:content-start max-[980px]:gap-3 max-[980px]:p-3">
+    <main className="auth-screen relative mx-auto grid min-h-screen max-w-[940px] grid-cols-2 content-center gap-4 bg-white px-4 py-5 max-[980px]:grid-cols-1 max-[980px]:gap-3 max-[980px]:p-3">
       <div className="auth-currency-bg" aria-hidden="true">
         {Array.from({ length: 16 }).map((_, index) => (
           <span key={`currency-${index}`}>
@@ -123,7 +123,7 @@ export function AuthScreen({
           </span>
         ))}
       </div>
-      <section className="hero-panel flex h-[var(--auth-panel-height)] flex-col items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[#f4f8f1] p-4 shadow-[0_10px_24px_rgba(28,69,21,0.08)] max-[980px]:h-[264px] max-[980px]:p-3">
+      <section className="hero-panel flex h-[var(--auth-panel-height)] flex-col items-center justify-center gap-2 rounded-[var(--radius-lg)] border border-[var(--line)] bg-[#f4f8f1] p-4 shadow-[0_10px_24px_rgba(28,69,21,0.08)] max-[980px]:h-[248px] max-[980px]:p-3">
         <img
           className="hero-logo h-auto w-full max-w-[320px] drop-shadow-[0_6px_12px_rgba(18,56,13,0.12)] max-[980px]:max-w-[270px]"
           src={calmCashLogo}
@@ -134,9 +134,9 @@ export function AuthScreen({
         </p>
       </section>
 
-      <section className="auth-card flex h-[var(--auth-panel-height)] flex-col justify-start overflow-visible rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-1)] px-4 py-3.5 shadow-[0_10px_24px_rgba(28,69,21,0.08)] max-[980px]:h-[392px] max-[980px]:p-3.5">
+      <section className="auth-card flex h-[var(--auth-panel-height)] flex-col justify-start overflow-visible rounded-[var(--radius-lg)] border border-[var(--line)] bg-[var(--surface-1)] px-4 py-3.5 shadow-[0_10px_24px_rgba(28,69,21,0.08)] max-[980px]:h-[418px] max-[980px]:p-3.5">
         <SegmentedTabs
-          className="auth-switch"
+          className="auth-switch mb-3 max-[980px]:mb-[0.44rem]"
           ariaLabel="Authentication mode"
           tabs={[
             { id: 'login', label: 'Sign In' },

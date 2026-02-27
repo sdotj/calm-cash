@@ -1,48 +1,12 @@
 
 @media (max-width: 980px) {
-  .dashboard-content,
-  .summary-grid {
-    grid-template-columns: 1fr;
-  }
-
   .dashboard-topbar {
     --topbar-pad-x: 0.95rem;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
     padding: 1rem;
-  }
-
-  .dashboard-topbar-controls {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
   }
 
   .dashboard-logo-mark {
     display: none;
-  }
-
-  .panel-head-row {
-    flex-direction: column;
-  }
-
-  .quick-actions-inline {
-    justify-content: flex-start;
-  }
-
-  .budget-panel-controls {
-    width: 100%;
-  }
-
-  .dashboard-empty-controls {
-    margin-left: 0;
-    margin-bottom: 0.75rem;
-    display: flex;
-    width: 100%;
-    flex-direction: row;
-    align-items: stretch;
-    gap: 0.5rem;
   }
 
   .dashboard-empty-controls > .month-picker,
@@ -91,9 +55,5 @@
 
   .draft-limit-row {
     grid-template-columns: 1fr;
-  }
-
-  .dashboard-page {
-    padding: 0.8rem;
   }
 }

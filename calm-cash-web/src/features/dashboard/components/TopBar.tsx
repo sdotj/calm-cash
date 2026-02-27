@@ -197,12 +197,12 @@ export function TopBar({
 
       {showLogoutConfirm ? (
         <div
-          className="logout-confirm-backdrop fixed inset-0 z-40 grid place-items-center p-4"
+          className="logout-confirm-backdrop fixed inset-0 z-40 grid place-items-center bg-[rgba(17,35,21,0.44)] p-4 backdrop-blur-[4px]"
           role="presentation"
           onClick={() => setShowLogoutConfirm(false)}
         >
           <section
-            className="logout-confirm-dialog w-[min(360px,100%)] rounded-xl border border-[var(--line)] bg-[var(--surface-1)] p-3.5"
+            className="logout-confirm-dialog w-[min(360px,100%)] rounded-xl border border-[var(--line)] bg-[var(--surface-1)] p-3.5 shadow-[0_18px_34px_rgba(14,35,18,0.28)]"
             role="dialog"
             aria-modal="true"
             aria-label="Logout confirmation"

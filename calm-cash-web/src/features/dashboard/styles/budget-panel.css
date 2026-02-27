@@ -156,28 +156,3 @@
   margin: 0 0 0.5rem;
   font-size: 1.04rem;
 }
-
-.current-budget-stats {
-  margin-bottom: 1rem;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.625rem;
-}
-
-.current-budget-stats div {
-  border: 1px solid #dcebd2;
-  border-radius: 10px;
-  padding: 0.52rem 0.62rem;
-  background: #fcfffa;
-}
-
-.current-budget-stats span {
-  margin-bottom: 0.125rem;
-  display: block;
-  font-size: 0.75rem;
-  color: var(--ink-500);
-}
-
-.current-budget-stats strong {
-  font-size: 1rem;
-}

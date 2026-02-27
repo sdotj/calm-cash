@@ -50,8 +50,8 @@ export function AuthForm({
     passwordChecks.minLength && passwordChecks.upper && passwordChecks.lower && passwordChecks.number && passwordChecks.special
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="stack-form auth-form grid gap-3.5 max-[980px]:gap-2" noValidate>
-      <fieldset className="auth-fieldset m-0 grid border-0 p-0" disabled={authLoading}>
+    <form onSubmit={(event) => void onSubmit(event)} className="stack-form auth-form grid gap-3.5 max-[980px]:gap-2.5" noValidate>
+      <fieldset className="auth-fieldset m-0 grid gap-3.5 border-0 p-0 max-[980px]:gap-2.5" disabled={authLoading}>
         <label>
           Email
           <input

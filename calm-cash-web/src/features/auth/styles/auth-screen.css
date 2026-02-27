@@ -1,18 +1,4 @@
 
-.auth-screen {
-  position: relative;
-  display: grid;
-  min-height: 100vh;
-  max-width: 940px;
-  margin: 0 auto;
-  align-content: center;
-  gap: 1rem;
-  background: #fff;
-  padding: 1.25rem 1rem;
-  grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
-  overflow: visible;
-}
-
 .auth-screen > section {
   position: relative;
   z-index: 2;
@@ -85,58 +71,9 @@
 .auth-currency-bg > span:nth-child(16) { left: 94%; top: 84%; animation-name: authCurrencyDriftC; animation-duration: 18s; animation-delay: -16s; width: 36px; height: 36px; }
 .auth-currency-bg > span:nth-child(16) .currency-glyph { font-size: 20px; }
 
-.hero-panel {
-  display: flex;
-  height: var(--auth-panel-height);
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border-radius: var(--radius-lg);
-  padding: 1rem;
-  background: #f4f8f1;
-  color: var(--ink-900);
-  border: 1px solid var(--line);
-  box-shadow: 0 10px 24px rgba(28, 69, 21, 0.08);
-}
-
-.hero-logo {
-  height: auto;
-  width: 100%;
-  max-width: 320px;
-  filter: drop-shadow(0 6px 12px rgba(18, 56, 13, 0.12));
-}
-
 .hero-tagline {
-  margin: 0;
-  text-align: center;
   font-family: 'Avenir Next', 'Trebuchet MS', 'Segoe UI', sans-serif;
-  letter-spacing: 0.03em;
-  font-weight: 600;
-  font-size: clamp(1rem, 1.7vw, 1.25rem);
   color: #2a6522;
-}
-
-.auth-card {
-  display: flex;
-  height: var(--auth-panel-height);
-  flex-direction: column;
-  justify-content: flex-start;
-  overflow: visible;
-  border-radius: var(--radius-lg);
-  padding: 0.875rem 1rem;
-  border: 1px solid var(--line);
-  background: var(--surface-1);
-  box-shadow: 0 10px 24px rgba(28, 69, 21, 0.08);
-}
-
-.auth-switch {
-  margin-bottom: 0.75rem;
-}
-
-.auth-forms-stage {
-  position: relative;
-  overflow: hidden;
 }
 
 .auth-form-panel {
@@ -176,33 +113,14 @@
 
 @media (max-width: 980px) {
   .auth-screen {
-    min-height: 0;
-    grid-template-columns: 1fr;
+    min-height: 100dvh;
     align-content: start;
-    gap: 0.75rem;
-    padding: 0.75rem;
   }
+}
 
-  .hero-panel {
-    height: 264px;
-    padding: 0.75rem;
-  }
-
-  .auth-card {
-    height: 392px;
-    padding: 0.875rem;
-  }
-
-  .hero-logo {
-    max-width: 270px;
-  }
-
-  .hero-tagline {
-    font-size: 1rem;
-  }
-
-  .auth-switch {
-    margin-bottom: 0.44rem;
+@media (max-width: 980px) and (min-height: 780px) {
+  .auth-screen {
+    align-content: center;
   }
 }
 
